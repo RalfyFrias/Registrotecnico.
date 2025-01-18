@@ -1,0 +1,91 @@
+﻿@page "/Tecnico/Delete/{TecnicoId:int}"
+@inject TecnicoServices tecnicoService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Técnico</PageTitle>
+
+<div class="container">
+    <div class="card shadow-header">
+        <div class="card-header bg-primary text-white text-center py-2 rounded">
+            <h3><strong>Eliminar Técnico</strong></h3>
+        </div>
+
+        <div class="card-header text-center">
+            <h3 class="text-danger">¿Estás seguro de que quieres eliminar este técnico?</h3>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-lg">
+                        <div class="card-header">
+                            <h3 class="text-center"><strong>Datos del técnico</strong></h3>
+                        </div>
+                        <div class="card-body">
+                            @if (tecnico != null)
+                            {
+                                <ul class="list-unstyled">
+                                    <li><strong>TécnicoId:</strong> @tecnico.TecnicoId</li>
+                                    <li><strong>Nombres:</strong> @tecnico.Nombres</li>
+                                    <li><strong>Sueldo por Hora:</strong> @tecnico.Sueldohora</li>
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-center text-danger">Técnico no encontrado.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (tecnico != null)
+        {
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-danger" @onclick="EliminarTecnico"><i class="bi bi-trash-fill"></i> Eliminar</button>
+                <button type="button" class="btn btn-outline-primary" @onclick="Retroceder"><i class="bi bi-box-arrow-left"></i> Retroceder</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int TecnicoId { get; set; }
+    public Tecnicos? tecnico { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (TecnicoId > 0)
+        {
+            tecnico = await tecnicoService.Buscar(TecnicoId);
+        }
+    }
+
+    private async Task EliminarTecnico()
+    {
+        if (TecnicoId == 0 || tecnico == null)
+        {
+            return;
+        }
+
+        bool eliminado = await tecnicoService.Eliminar(TecnicoId);
+        @if (await tecnicoService.Eliminar(TecnicoId))
+        {
+            toastService.ShowSuccess("El técnico se ha eliminado correctamente.");
+            Retroceder();
+        }
+        else
+        {
+            toastService.ShowError("Ocurrió un error al intentar eliminar el técnico.");
+        }
+    }
+
+    private void Retroceder()
+    {
+        navigationManager.NavigateTo("/Tecnico/Index");
+    }
+}

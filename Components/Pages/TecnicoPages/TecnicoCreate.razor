@@ -1,0 +1,82 @@
+﻿@page "/Tecnico/Create"
+@inject TecnicoServices tecnicoServices
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+@rendermode InteractiveServer
+
+<EditForm Model="tecnicos" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow-lg border-0" style="background-color white">
+
+        <div class="card-header bg-primary text-center text-white py-2 rounded">
+            <h3 style="font-weight: bold;" class="font-weight-bold">Registro de Técnicos</h3>
+        </div>
+
+        <div class="card-body">
+            @*TécnicoId*@ 
+            <div class="mb-3">
+                <label for="TecnicoId" class="form-label">TécnicoId:</label>
+                <InputNumber @bind-Value="tecnicos.TecnicoId" class="form-control" />
+            </div>
+            @*Nombres*@ 
+            <div class="mb-3">
+                <label for="Nombres" class="form-label">Nombres:</label>
+                <InputText @bind-Value="tecnicos.Nombres" class="form-control" />
+                <ValidationMessage For="@(() => tecnicos.Nombres)" />
+            </div>
+            @*SueldoHora*@ 
+            <div class="mb-3">
+                <label for="SueldoHora" class="form-label">Sueldo por Hora:</label>
+                <InputNumber @bind-Value="tecnicos.Sueldohora" class="form-control" />
+                <ValidationMessage For="@(() => tecnicos.Sueldohora)" />
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-lg-center text-center">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary ml-2" @onclick="Nuevo"><span class="bi bi-plus"></span>Nuevo</button>
+                <button type="submit" class="btn btn-outline-success ml-2"><span class="bi bi-check-circle-fill"></span>Guardar</button>
+                <button type="button" class="btn btn-outline-danger" @onclick="Retroceder"><span class="bi bi-arrow-bar-left"></span>Retroceder</button>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    public Tecnicos tecnicos { get; set; } = new Tecnicos();
+    private bool existe = false;
+
+    public async Task Nuevo()
+    {
+        tecnicos = new Tecnicos();
+        existe = false;
+    }
+
+    public async Task<bool> Validar()
+    {
+        existe = await tecnicoServices.Existe(tecnicos.TecnicoId);
+        return existe;
+    }
+
+    public async Task Guardar()
+    {
+        if (await Validar())
+        {
+            toastService.ShowWarning("Ya existe un técnico con este nombre.");
+            return;
+        }
+
+        var guardado = await tecnicoServices.Guardar(tecnicos);
+        if (guardado)
+        {
+            toastService.ShowSuccess("El técnico se ha guardado correctamente.");
+            await Nuevo();
+            Retroceder();
+        }
+    }
+
+    public void Retroceder()
+    {
+        navigationManager.NavigateTo("/Tecnico/Index");
+    }
+}
