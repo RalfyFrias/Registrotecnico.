@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Registrotecnico.Components;
+using Registrotecnico.DAL;
+using Registrotecnico.Services;
+using Blazored.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+var ConStr = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
+
+builder.Services.AddScoped<TecnicoServices>();
+builder.Services.AddBlazoredToast();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
