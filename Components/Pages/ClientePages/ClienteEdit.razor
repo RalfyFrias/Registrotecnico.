@@ -84,7 +84,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // Cargar lista de técnicos
+       
         Tecnicos = await tecnicoService.Listar(c => true);
 
         if (ClienteId != 0)
