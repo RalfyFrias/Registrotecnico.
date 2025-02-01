@@ -1,0 +1,90 @@
+﻿@page "/Ciudad/Delete/{CiudadId:int}"
+@inject CiudadServices ciudadService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Ciudad</PageTitle>
+
+<div class="container">
+    <div class="card shadow-header">
+        <div class="card-header bg-primary text-white text-center py-2 rounded">
+            <h3><strong>Eliminar Ciudad</strong></h3>
+        </div>
+
+        <div class="card-header text-center">
+            <h3 class="text-danger">¿Estás seguro de que quieres eliminar esta ciudad?</h3>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-lg">
+                        <div class="card-header">
+                            <h3 class="text-center"><strong>Datos de la ciudad</strong></h3>
+                        </div>
+                        <div class="card-body">
+                            @if (ciudad != null)
+                            {
+                                <ul class="list-unstyled">
+                                    <li><strong>CiudadId:</strong> @ciudad.CiudadId</li>
+                                    <li><strong>Nombres:</strong> @ciudad.Nombres</li>
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-center text-danger">Ciudad no encontrada.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (ciudad != null)
+        {
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-danger" @onclick="EliminarCiudad"><i class="bi bi-trash-fill"></i> Eliminar</button>
+                <button type="button" class="btn btn-outline-primary" @onclick="Retroceder"><i class="bi bi-box-arrow-left"></i> Retroceder</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CiudadId { get; set; }
+    public Ciudades? ciudad { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (CiudadId > 0)
+        {
+            ciudad = await ciudadService.Buscar(CiudadId);
+        }
+    }
+
+    private async Task EliminarCiudad()
+    {
+        if (CiudadId == 0 || ciudad == null)
+        {
+            return;
+        }
+
+        bool eliminado = await ciudadService.Eliminar(CiudadId);
+        if (eliminado)
+        {
+            toastService.ShowSuccess("La ciudad se ha eliminado correctamente.");
+            Retroceder();
+        }
+        else
+        {
+            toastService.ShowError("Ocurrió un error al intentar eliminar la ciudad.");
+        }
+    }
+
+    private void Retroceder()
+    {
+        navigationManager.NavigateTo("/Ciudad/Index");
+    }
+}
