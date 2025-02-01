@@ -1,0 +1,105 @@
+﻿ @page "/Ciudad/Edit"
+@page "/Ciudad/Edit/{CiudadId:int}"
+@inject CiudadServices ciudadService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+
+@rendermode InteractiveServer
+
+@* <EditForm Model="ciudad" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <div class="card shadow-lg border-0 bg-white">
+    <div class="card-header bg-primary text-center text-white py-2 rounded">
+            <h3 class="font-weight-bold">Modificar Ciudad</h3>
+        </div>
+        @*ClienteId*@ 
+   @*          <div class="mb-3">
+            <label for="ClienteId" class="form-label">ClienteId:</label>
+            <InputNumber @bind-Value="ciudades.CiudadId" class="form-control" />
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="Nombres" class="form-label">Nombre de la Ciudad:</label>
+                <InputText @bind-Value="ciudad.Nombres" class="form-control" />
+                <ValidationMessage For="@(() => ciudad.Nombres)" />
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-center">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary" @onclick="Nuevo">
+                    <span class="bi bi-plus"></span> Nuevo
+                </button>
+                <button type="submit" class="btn btn-outline-success">
+                    <span class="bi bi-check-circle-fill"></span> Guardar
+                </button>
+                <button type="button" class="btn btn-outline-danger" @onclick="Retroceder">
+                    <span class="bi bi-arrow-bar-left"></span> Retroceder
+                </button>
+            </div>
+        </div>
+    </div>
+</EditForm> *@ *@@* @* 
+
+@code { *@ *
+    [Parameter]
+    public int CiudadId { get; set; }
+    public Ciudades ciudad { get; set; } = new Ciudades();
+    private bool existe = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (CiudadId != 0)
+        {
+            await Buscar();
+        }
+    }
+
+    private async Task Buscar()
+    {
+        existe = false;
+        var ciudadEncontrada = await ciudadService.Buscar(CiudadId);
+        if (ciudadEncontrada != null)
+        {
+            ciudad = ciudadEncontrada;
+        }
+        else
+        {
+            await Nuevo();
+        }
+    }
+
+    private async Tas@* k<bool>  *@Validar()
+    {
+        var listaCiudades = await ciudadService.Listar(c => c.Nombres.ToLower() == ciudad.Nombres.ToLower() && c.CiudadId != ciudad.CiudadId);
+        existe = listaCiudades.Any();
+        return !existe;
+    }
+
+    private async Task Nuevo()
+    {
+        ciudad = new Ciudades();
+        existe = false;
+    }
+
+    private async Task Guardar()
+    {
+        if (!await Validar())
+        {
+            toastService.ShowWarning("Ya existe una ciudad con este nombre.");
+            return;
+        }
+
+        var guardado = await ciudadService.Guardar(ciudad);
+        if (guardado)
+        {
+            toastService.ShowSuccess("La ciudad se ha guardado correctamente.");
+            await Nuevo();
+        }
+    }
+
+    private void Retroceder()
+    {
+        navigationManager.NavigateTo("/Ciudad/Index");
+    }
+}
