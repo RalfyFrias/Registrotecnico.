@@ -22,6 +22,23 @@ namespace Registrotecnico.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Registrotecnico.Models.Ciudades", b =>
+                {
+                    b.Property<int>("CiudadId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CiudadId"));
+
+                    b.Property<string>("Nombres")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CiudadId");
+
+                    b.ToTable("Ciudad");
+                });
+
             modelBuilder.Entity("Registrotecnico.Models.Clientes", b =>
                 {
                     b.Property<int>("ClienteId")
@@ -48,6 +65,9 @@ namespace Registrotecnico.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TecnicoId")
+                        .HasColumnType("int");
+
                     b.HasKey("ClienteId");
 
                     b.ToTable("Clientes");
@@ -61,9 +81,6 @@ namespace Registrotecnico.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TecnicoId"));
 
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Nombres")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -73,25 +90,43 @@ namespace Registrotecnico.Migrations
 
                     b.HasKey("TecnicoId");
 
-                    b.HasIndex("ClienteId");
-
                     b.ToTable("Tecnico");
                 });
 
-            modelBuilder.Entity("Registrotecnico.Models.Tecnicos", b =>
+            modelBuilder.Entity("Registrotecnico.Models.Tickets", b =>
                 {
-                    b.HasOne("Registrotecnico.Models.Clientes", "Clientes")
-                        .WithMany("Tecnico")
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("TicketId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Navigation("Clientes");
-                });
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TicketId"));
 
-            modelBuilder.Entity("Registrotecnico.Models.Clientes", b =>
-                {
-                    b.Navigation("Tecnico");
+                    b.Property<string>("Asunto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Prioridad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TecnicoId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TiempoInvertido")
+                        .HasColumnType("float");
+
+                    b.HasKey("TicketId");
+
+                    b.ToTable("Tickets");
                 });
 #pragma warning restore 612, 618
         }
