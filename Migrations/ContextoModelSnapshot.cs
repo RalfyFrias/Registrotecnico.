@@ -21,6 +21,27 @@ namespace Registrotecnico.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Registrotecnico.Models.Sistemas", b =>
+                {
+                    b.Property<int>("SistemaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SistemaId"));
+
+                    b.Property<string>("Complejidad")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SistemaId");
+
+                    b.ToTable("sistema");
+                });
+
             modelBuilder.Entity("Registrotecnico.Models.Tecnicos", b =>
                 {
                     b.Property<int>("TecnicoId")
@@ -29,16 +50,16 @@ namespace Registrotecnico.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TecnicoId"));
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("Nombres")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<float>("Sueldohora")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Sueldohora")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("TecnicoId");
 
-                    b.ToTable("Tecnicos");
+                    b.ToTable("Tecnico");
                 });
 #pragma warning restore 612, 618
         }
