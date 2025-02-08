@@ -1,0 +1,91 @@
+﻿@page "/Sistema/Delete/{SistemaId:int}"
+@inject SistemaServices sistemaService
+@inject NavigationManager navigationManager
+@inject IToastService toastService
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Sistema</PageTitle>
+
+<div class="container">
+    <div class="card shadow-header">
+        <div class="card-header bg-primary text-white text-center py-2 rounded">
+            <h3><strong>Eliminar Sistema</strong></h3>
+        </div>
+
+        <div class="card-header text-center">
+            <h3 class="text-danger">¿Estás seguro de que quieres eliminar este sistema?</h3>
+        </div>
+
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow-lg">
+                        <div class="card-header">
+                            <h3 class="text-center"><strong>Datos del sistema</strong></h3>
+                        </div>
+                        <div class="card-body">
+                            @if (sistema != null)
+                            {
+                                <ul class="list-unstyled">
+                                    <li><strong>SistemaId:</strong> @sistema.SistemaId</li>
+                                    <li><strong>Descripción:</strong> @sistema.Descripcion</li>
+                                    <li><strong>Complejidad:</strong> @sistema.Complejidad</li>
+                                </ul>
+                            }
+                            else
+                            {
+                                <p class="text-center text-danger">Sistema no encontrado.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (sistema != null)
+        {
+            <div class="card-footer text-center">
+                <button type="button" class="btn btn-outline-danger" @onclick="EliminarSistema"><i class="bi bi-trash-fill"></i> Eliminar</button>
+                <button type="button" class="btn btn-outline-primary" @onclick="Retroceder"><i class="bi bi-box-arrow-left"></i> Retroceder</button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int SistemaId { get; set; }
+    public Sistemas? sistema { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (SistemaId > 0)
+        {
+            sistema = await sistemaService.Buscar(SistemaId);
+        }
+    }
+
+    private async Task EliminarSistema()
+    {
+        if (SistemaId == 0 || sistema == null)
+        {
+            return;
+        }
+
+        bool eliminado = await sistemaService.Eliminar(SistemaId);
+        if (eliminado)
+        {
+            toastService.ShowSuccess("El sistema se ha eliminado correctamente.");
+            Retroceder();
+        }
+        else
+        {
+            toastService.ShowError("Ocurrió un error al intentar eliminar el sistema.");
+        }
+    }
+
+    private void Retroceder()
+    {
+        navigationManager.NavigateTo("/Sistema/Index");
+    }
+}
