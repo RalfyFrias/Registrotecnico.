@@ -9,5 +9,6 @@ namespace Registrotecnico.DAL
         public Contexto(DbContextOptions<Contexto> options)
               : base(options) { }
         public DbSet<Tecnicos> Tecnico { get; set; }
+        public DbSet<Sistemas> sistemas { get; set; }
     }
 }
